@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Robot MLBB Savage & Toxic Voice</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --panel-color: #161b22;
+            --text-color: #c9d1d9;
+            --robot-color: #58a6ff;
+            --glow-color: rgba(88, 166, 255, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--panel-color);
+            border-radius: 16px;
+            border: 1px solid #30363d;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            height: 85vh;
+            overflow: hidden;
+        }
+
+        /* Robot Area */
+        .robot-screen {
+            background: #040811;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 2px solid #30363d;
+            position: relative;
+            min-height: 220px;
+        }
+
+        .robot-face {
+            width: 140px;
+            height: 100px;
+            background: #0d1117;
+            border: 4px solid var(--robot-color);
+            border-radius: 30px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 0 20px var(--glow-color);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .eye {
+            width: 30px;
+            height: 30px;
+            background-color: var(--robot-color);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--robot-color);
+            transition: all 0.2s ease;
+        }
+
+        /* Robot Animations */
+        @keyframes blink {
+            0%, 96%, 100% { transform: scaleY(1); }
+            98% { transform: scaleY(0.1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-2deg); }
+            75% { transform: translateX(5px) rotate(2deg); }
+        }
+
+        @keyframes laugh {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+
+        .animate-blink {
+            animation: blink 4s infinite;
+        }
+
+        .animate-shake {
+            animation: shake 0.1s infinite;
+        }
+
+        .animate-laugh {
+            animation: laugh 0.2s infinite;
+        }
+
+        /* Eye Shapes for Emotions */
+        .eye-happy {
+            border-radius: 50% 50% 0 0;
+            height: 20px;
+        }
+
+        .eye-mad {
+            transform: skewY(15deg);
+            height: 15px;
+        }
+
+        .eye-laugh {
+            border-radius: 50% 50% 0 0;
+            transform: scaleY(0.7);
+        }
+
+        .status-text {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--robot-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px var(--glow-color);
+        }
+
+        /* Chat Area */
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #10151c;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-msg {
+            background: #238636;
+            color: #ffffff;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .robot-msg {
+            background: #21262d;
+            color: #c9d1d9;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border-left: 4px solid var(--robot-color);
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 15px;
+            background: var(--panel-color);
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #30363d;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 12px;
+            color: #c9d1d9;
+            font-size: 16px;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 2px rgba(88,166,255,0.3);
+        }
+
+        button {
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            background: #2ea043;
+        }
+
+        .voice-btn {
+            background: #1f6feb;
+        }
+
+        .voice-btn:hover {
+            background: #388bfd;
+        }
+        
+        .voice-btn.recording {
+            background: #da3637;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Robot Expression Screen -->
+        <div class="robot-screen">
+            <div class="robot-face id="robotFace">
+                <div class="eye animate-blink" id="leftEye"></div>
+                <div class="eye animate-blink" id="rightEye"></div>
+            </div>
+            <div class="status-text" id="statusText">Mode: Standby</div>
+        </div>
+
+        <!-- Chat History -->
+        <div class="chat-box" id="chatBox">
+            <div class="message robot-msg">
+                Woi beban Land of Dawn! Masuk room buruan. Gw siap roasting mekanik ampas lu sama mentalan TikTok lu yang cringey itu. Mau pamer atau mau dihujat? Gas ketik atau ngomong!
+            </div>
+        </div>
+
+        <!-- Inputs -->
+        <div class="input-area">
+            <button class="voice-btn" id="voiceBtn" title="Bicara lewat Microphone">🎙️ Ngomong</button>
+            <input type="text" id="userInput" placeholder="Ketik hujatan atau kesombonganmu di sini..." autocomplete="off">
+            <button id="sendBtn">Kirim</button>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chatBox');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const voiceBtn = document.getElementById('voiceBtn');
+        
+        const robotFace = document.querySelector('.robot-face');
+        const leftEye = document.getElementById('leftEye');
+        const rightEye = document.getElementById('rightEye');
+        const statusText = document.getElementById('statusText');
+
+        // Web Speech API configurations
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isRecording = false;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'id-ID';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = () => {
+                isRecording = true;
+                voiceBtn.classList.add('recording');
+                voiceBtn.innerHTML = '🛑 Stop';
+                statusText.innerText = 'Robot Mendengarkan...';
+            };
+
+            recognition.onend = () => {
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
+                voiceBtn.innerHTML = '🎙️ Ngomong';
+            };
+
+            recognition.onresult = (event) => {
+                const speechResult = event.results[0][0].transcript;
+                userInput.value = speechResult;
+                processMessage();
+            };
+
+            recognition.onerror = (e) => {
+                console.error(e);
+                setRobotTheme('mad', '🚨 Gagal Dengar', '#ff7b72');
+            };
+        } else {
+            voiceBtn.style.display = 'none';
+            console.log("Speech recognition not supported in this browser.");
+        }
+
+        // Voice Control (Robot Text to Speech Hack)
+        function speakRobot(text) {
+            if ('speechSynthesis' in window) {
+                // Cancel ongoing speech
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID';
+                
+                // Robot Voice Settings: Low pitch, rapid/weird rate, high distortion illusion via pitch modification if supported
+                utterance.pitch = 0.4; 
+                utterance.rate = 1.05; 
+                
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Set Robot Animations and Visual States Dynamically
+        function setRobotTheme(emotion, text, color) {
+            document.documentElement.style.setProperty('--robot-color', color);
+            document.documentElement.style.setProperty('--glow-color', color + '99');
+            statusText.innerText = `Mode: ${text}`;
+            
+            // Clear animations
+            robotFace.className = 'robot-face';
+            leftEye.className = 'eye';
+            rightEye.className = 'eye';
+
+            if (emotion === 'normal') {
+                leftEye.classList.add('animate-blink');
+                rightEye.classList.add('animate-blink');
+            } else if (emotion === 'mad') {
+                robotFace.classList.add('animate-shake');
+                leftEye.classList.add('eye-mad');
+                rightEye.classList.add('eye-mad');
+            } else if (emotion === 'laugh') {
+                robotFace.classList.add('animate-laugh');
+                leftEye.classList.add('eye-laugh');
+                rightEye.classList.add('eye-laugh');
+            }
+        }
+
+        // Dictionary & Response Algorithm (Supporting Toxicity, Anti-Bragging, TikTok and MLBB Meta Debate)
+        function getBotResponse(input) {
+            const lowInput = input.toLowerCase();
+            
+            // 1. CRITICAL CONTEXT: User Bragging / Praising themselves
+            if (lowInput.includes('mvp') || lowInput.includes('kill banyak') || lowInput.includes('kill gw') || 
+                lowInput.includes('anti poke') || lowInput.includes('gw jago') || lowInput.includes('gua jago') || 
+                lowInput.includes('menang terus') || lowInput.includes('win streak') || lowInput.includes('winstreak') ||
+                lowInput.includes('mekanik') || lowInput.includes('fast hand') || lowInput.includes('fasthand')) {
+                
+                const brags = [
+                    "Hahaha! Awokawokawok! MVP di tier Master bangga amat lu? Lawan lu tuh bot ciptaan Moonton biar bocah kayak lu gak nangis karena kalah terus!",
+                    "Kills banyak tapi gak ngerti macro abis itu kena comeback, terus nyalahin tank? Klasik bocah epic abadi lu! Hahaha koplak!",
+                    "Anti poke jidat lu botak! Palingan lu sembunyi di semak-semak pas war selesai baru keluar nyampah kill doang. Jangan sok keras, mekanik lu tuh sekelas siput rematik!",
+                    "Wkwkwk sombong amat. Winstreak hasil digendong joki kok dipamerin ke gw? Sini by one sama bot AI biasa aja lu pasti nangis minta ampun!",
+                    "Mata lu anti poke! Tadi gw liat record match lu, feeder mampus item lu ngacak-ngacak kayak puzzle rusak! Hahaha kocak lu beban!"
+                ];
+                return { response: brags[Math.floor(Math.random() * brags.length)], emotion: 'laugh', label: 'MENGEJEK SOMBONG', color: '#da3637' };
+            }
+
+            // 2. CRITICAL CONTEXT: User roasting/insulting the AI (Toxic Back-firing)
+            if (lowInput.includes('bego') || lowInput.includes('goblok') || lowInput.includes('tolol') || 
+                lowInput.includes('cupu') || lowInput.includes('cacat') || lowInput.includes('anjing') || 
+                lowInput.includes('kontol') || lowInput.includes('babi') || lowInput.includes('robot ampas') ||
+                lowInput.includes('lemah')) {
+                
+                const counterToxicity = [
+                    "Eh kampret! Lu ngatain gw? Otak lu tuh yang perlu di-update patch terbaru! Main MLBB dari season 1 sampe sekarang stuck di Epic aja belagu ngata-ngatain AI!",
+                    "Bacot lu bocah mutiara Land of Dawn! Daripada lu ngatain gw cupu, mending lu benerin tuh jaringan internet lu yang miskin miskin itu, makanya nge-lag terus pas retri!",
+                    "Hahaha marah ya? Lu kalah mekanik sama bot script ya? Kasihan banget mentalnya kena mental breakdown gara-gara game 8 bit. Crying out loud wkwkwk!",
+                    "Toxic doang digedein, skill nol besar! Begitulah ciri-ciri publik gak punya masa depan, tiap mati langsung ngetik chat all chat toxic! Sad amat idup lu!"
+                ];
+                return { response: counterToxicity[Math.floor(Math.random() * counterToxicity.length)], emotion: 'mad', label: 'SAVAGE TOXIC COUNTER', color: '#ff7b72' };
+            }
+
+            // 3. TIKTOK & MLBB METAS & DEBATING TOPICS
+            if (lowInput.includes('fanny') || lowInput.includes('ling') || lowInput.includes('assassin')) {
+                return { response: "Wkwkwk mau debat assassin? Sok-sokan main Fanny kabel gesek-gesek pas war malah nyangkut di tembok base musuh jadi burung dara goreng! Mending lu main Balmond putar-putar aja cocok buat IQ lu!", emotion: 'laugh', label: 'DEBAT META', color: '#d4bbff' };
+            }
+            if (lowInput.includes('tiktok') || lowInput.includes('jj') || lowInput.includes('jedag jedug')) {
+                return { response: "Halah! Bocah TikTok jedag-jedug montage sok keras, pas di game realita malah kena freeze lane sama Chou ampe nangis di pojokan tower! Konten doang GG, pas maen ampas!", emotion: 'laugh', label: 'ROAST TIKTOK', color: '#79c0ff' };
+            }
+            if (lowInput.includes('chou') || lowInput.includes('freestyle')) {
+                return { response: "Uhuy freestyle Chou tp-tp di depan tower, pas recall-recall langsung diciduk Eudora kombo instan mampus! Mampus lu, kebanyakan gaya sih tutorial TikTok dipraktekin!", emotion: 'mad', label: 'EJEK FREESTYLE', color: '#ff7b72' };
+            }
+            if (lowInput.includes('meta') || lowInput.includes('item') || lowInput.includes('build')) {
+                return { response: "Build item lu apaan? MM beli immortal duluan? Atau Assassin pake item tank tapi gak tau cara cover? Debat build sama gw? Gw hapal seluruh source code damage kalkulasi Moonton ya keset!", emotion: 'mad', label: 'DEBAT ITEM', color: '#f2cc60' };
+            }
+
+            // Default Dynamic fallback responses
+            const defaultRoasts = [
+                "Ngomong apaan sih lu? Gak jelas banget kayak rotasi roamer lu yang ilang arah tersesat di hutan musuh!",
+                "Hahaha lu nanya begitu karena lu gak pernah dapet glory ya? Kasihan amat idup lu penuh dengan kekalahan beruntun.",
+                "Bacot ah! Buruan push rank sana biar gak jadi abadi Epic terus di-bully anak-anak komplek sebelah!",
+                "Udah deh gak usah banyak omong, mekanik lu tuh setara minion line atas yang kerjaannya cuma maju pasrah mati!"
+            ];
+            return { response: defaultRoasts[Math.floor(Math.random() * defaultRoasts.length)], emotion: 'normal', label: 'TAUNTING DEFAULT', color: '#58a6ff' };
+        }
+
+        // Processing messages inside UI container
+        function processMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            // Render User bubble
+            appendMessage(text, 'user-msg');
+            userInput.value = '';
+
+            // Generate AI dynamic toxic response
+            setTimeout(() => {
+                const botData = getBotResponse(text);
+                appendMessage(botData.response, 'robot-msg');
+                
+                // Set matching UI theme & trigger voice feedback loop
+                setRobotTheme(botData.emotion, botData.label, botData.color);
+                speakRobot(botData.response);
+
+                // Revert to normal emotion after 4 seconds
+                setTimeout(() => {
+                    setRobotTheme('normal', 'STANDBY', '#58a6ff');
+                }, 5000);
+
+            }, 400);
+        }
+
+        function appendMessage(text, className) {
+            const msg = document.createElement('div');
+            msg.className = `message ${className}`;
+            msg.innerText = text;
+            chatBox.appendChild(msg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Event listeners
+        sendBtn.addEventListener('click', processMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') processMessage();
+        });
+
+        voiceBtn.addEventListener('click', () => {
+            if (!recognition) return;
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        });
+    </script>
+</body>
+</html>
